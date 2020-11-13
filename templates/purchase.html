@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <br>
+
+    {% if request.user.is_authenticated %}
+        <div style='float:right;'>
+            Funds - ${{ request.user.funds }}
+        </div>
+    {% endif %}
+
+    <br>
+    <br>
+    <br>
+
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">Product</th>
+            <th scope="col">Purchased number</th>
+            <th scope="col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for object in page_obj %}
+            <tr>
+                <td>{{ object.products.product_name }}</td>
+                <td>{{ object.purchase_number }}</td>
+                {% load custom_templates %}
+                <td>
+                    {% if object.created_at|time_diff %}
+                    <form method="post" action="{% url 'return' %}">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button class="btn btn-warning" type="submit">Refund</button>
+                        <input type="hidden" name="id_value" value="{{ object.id }}">
+                        </form>
+                        {% else %}
+                    Not refundable
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+    <br>
+
+    <div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+    </div>
+
+{% endblock %}

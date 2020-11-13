@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <br>
+
+    {% if request.user.is_authenticated %}
+        <div style='float:right;'>
+            Funds - ${{ request.user.funds }}
+        </div>
+    {% endif %}
+
+    <br>
+    <br>
+    <br>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">Product</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Price</th>
+            {% if request.user.is_authenticated %}
+                <th scope="col">Actions</th>
+            {% endif %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for object in page_obj %}
+            <tr>
+                {% if object.number %}
+                    <td>{{ object.product_name }} {{ object.id }}</td>
+                    <td>{{ object.number }}</td>
+                    <td> ${{ object.price_for_one }}</td>
+                    {% if request.user.is_authenticated %}
+                        <td>
+                        <span>
+                            <form method="post" action="{% url 'purchase' %}">
+                                {% csrf_token %}
+                                {{ form.as_p }}
+                                {% if messages %}
+                                    {% if request.session.product_id_error == object.id %}
+                                        {% for message in messages %}
+                                            <div class="p-3 w-50 mb-2 bg-warning text-dark">{{ message }}</div>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endif %}
+                                <button class="btn btn-primary" type="submit">Purchase</button>
+                                <input type="hidden" name="id_value" value="{{ object.id }}">
+                            </form>
+                        </span>
+                            <span>
+                            <form method="post" action="{% url 'edit' pk=object.pk %}">
+                                {% csrf_token %}
+                                <button class="btn btn-primary" type="submit">Edit</button>
+                            </form>
+                        </span>
+                        </td>
+                    {% endif %}
+                {% endif %}
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+    <br>
+
+    <div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+    </div>
+
+{% endblock %}
