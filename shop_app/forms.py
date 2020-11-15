@@ -1,17 +1,24 @@
-from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
-from django.core.validators import MinValueValidator
 from django.forms import ModelForm
-from django.http import HttpResponseRedirect
 
 from shop_app.models import ShopUser, Purchase, Products, Return
 
 
 class SignUpForm(UserCreationForm):
+    first_name = forms.CharField(max_length=30, required=False)
+    last_name = forms.CharField(max_length=30, required=False)
+    email = forms.EmailField(max_length=255)
+
+    def __init__(self, *args, **kwargs):
+        super(SignUpForm, self).__init__(*args, **kwargs)
+
+        for fieldname in ['username', 'password1', 'password2']:
+            self.fields[fieldname].help_text = None
+
     class Meta:
         model = ShopUser
-        fields = ('username', 'password1', 'password2')
+        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
 
 
 class PurchaseForm(ModelForm):
@@ -25,7 +32,7 @@ class PurchaseForm(ModelForm):
 class CreateProductForm(ModelForm):
     class Meta:
         model = Products
-        fields = ['product_name', 'number', 'price_for_one']
+        fields = ['product_name', 'description', 'number', 'price_for_one']
 
 
 class AddReturnForm(ModelForm):

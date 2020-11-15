@@ -75,8 +75,11 @@ class PurchaseView(LoginRequiredMixin, CreateView):
         purchase = form.save(commit=False)
         purchase.user = self.request.user
         purchase.purchase_number = int(self.request.POST['purchase_number'])
+
         current_user = ShopUser.objects.get(id=self.request.user.id)
+
         id_value = self.request.POST.get('id_value')
+
         product = Products.objects.get(id=id_value)
 
         current_user.funds -= purchase.purchase_number * product.price_for_one
@@ -85,7 +88,7 @@ class PurchaseView(LoginRequiredMixin, CreateView):
         product.number -= purchase.purchase_number
         product.save()
 
-        purchase.products = product
+        purchase.product = product
         purchase.save()
 
         return super().form_valid(form)
@@ -143,9 +146,9 @@ class ReturnActionView(LoginRequiredMixin, CreateView):
         self.object = form.save(commit=False)
         id_value = self.request.POST.get('id_value')
         returned_product = Return.objects.get(id=id_value)
-        current_user = User.objects.get(id=self.request.user.id)
-        product = Products.objects.get(id=returned_product.declined_product.products.id)
-        price_for_one = returned_product.declined_product.products.price_for_one
+        product = Products.objects.get(id=returned_product.declined_product.product.id)
+        current_user = User.objects.get(id=returned_product.declined_product.user.id)
+        price_for_one = returned_product.declined_product.product.price_for_one
         purchased_number = returned_product.declined_product.purchase_number
 
         if 'action-approve' in self.request.POST:
@@ -176,29 +179,4 @@ class EditProductView(LoginRequiredMixin, UpdateView):
     model = Products
     template_name = 'edit.html'
     success_url = '/'
-    # initial = {'product_name': '1', 'number': '1', 'price_for_one': '1'}
-    fields = ['product_name', 'number', 'price_for_one']
-
-    def get_form(self, form_class=None):
-        form = super(EditProductView, self).get_form(form_class)
-        # form.instance.product_name = self.request.user
-        return form
-
-    # def get_initial(self):
-    #     initial = super(EditProductView, self).get_initial()
-    #     print('initial data', initial)
-    #
-    #     current_group = self.object.product_name
-    #
-    #     initial['product_name'] = current_group
-    #
-    #     print('initial data', initial)
-    #
-    #     #
-    #     # # retrieve current object
-    #     # habit_object = self.get_object()
-    #     #
-    #     # initial['field1'] = habit_object.field1
-    #     # initial['field2'] = habit_object.field2
-    #
-    #     return initial
+    fields = ['product_name', 'description', 'number', 'price_for_one']

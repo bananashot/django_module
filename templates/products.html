@@ -18,6 +18,7 @@
         <thead>
         <tr>
             <th scope="col">Product</th>
+            <th scope="col">Description</th>
             <th scope="col">Amount</th>
             <th scope="col">Price</th>
             {% if request.user.is_authenticated %}
@@ -29,7 +30,8 @@
         {% for object in page_obj %}
             <tr>
                 {% if object.number %}
-                    <td>{{ object.product_name }} {{ object.id }}</td>
+                    <td>{{ object.product_name }}</td>
+                    <td>{{ object.description }}</td>
                     <td>{{ object.number }}</td>
                     <td> ${{ object.price_for_one }}</td>
                     {% if request.user.is_authenticated %}

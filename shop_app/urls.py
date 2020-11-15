@@ -1,14 +1,18 @@
 from django.urls import path
 
-from shop_app.views import Registration, Login, Logout, ProductList
+from shop_app.views import ProductList, Login, Logout, Registration, PurchaseView, HistoryView, AddReturnView, \
+    ReturnListView, ReturnActionView, CreateProductView, EditProductView
 
 urlpatterns = [
-    path('/', ProductList.as_view(), name='products'),
+    path('', ProductList.as_view(), name='products'),
     path('login/', Login.as_view(), name='login'),
     path('logout/', Logout.as_view(), name='logout'),
     path('registration/', Registration.as_view(), name='registration'),
-    path('create_note/', NotesCreateView.as_view(), name='create_note'),
-    path('delete_note/<int:pk>/', NoteDeleteView.as_view(), name='delete_note'),
-    path('share_note/<int:pk>/', NoteShareView.as_view(), name='share_note'),
-    path('shared/', NotesSharedListView.as_view(), name='shared')
+    path('purchases/', HistoryView.as_view(), name='purchase-history'),
+    path('purchase/', PurchaseView.as_view(), name='purchase'),
+    path('return/', AddReturnView.as_view(), name='return'),
+    path('returns/', ReturnListView.as_view(), name='return-admin'),
+    path('create/', CreateProductView.as_view(), name='create'),
+    path('edit/<int:pk>/', EditProductView.as_view(), name='edit'),
+    path('returns/action/', ReturnActionView.as_view(), name='approve-decline'),
 ]
